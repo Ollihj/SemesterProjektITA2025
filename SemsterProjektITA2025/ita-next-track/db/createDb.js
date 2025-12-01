@@ -13,18 +13,23 @@ console.log('Recreating tables...');
 await db.query(`
     create table tracks (
         track_id bigint primary key,
-	    title text not null,
-	    artist text not null,
-	    duration int not null
+        title text not null,
+        artist text not null,
+        duration int not null,
+        energy_level int not null,
+        tempo int not null,
+        mood text not null,
+        is_instrumental boolean not null,
+        activity_fit text not null
     )
 `);
 console.log('Tables recreated.');
 
 console.log('Importing data from CSV files...');
 await upload(db, 'db/short-tracks.csv', `
-	copy tracks (track_id, title, artist, duration)
-	from stdin
-	with csv header`);
+    copy tracks (track_id, title, artist, duration, energy_level, tempo, mood, is_instrumental, activity_fit)
+    from stdin
+    with csv header`);
 console.log('Data imported.');
 
 await db.end();
