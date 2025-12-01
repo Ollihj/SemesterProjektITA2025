@@ -1,21 +1,26 @@
-track_id,title,artist,duration
-7399,Blinding Lights,The Weeknd,15523
-4733,Shape of You,Ed Sheeran,16697
-4256,Uptown Funk,Mark Ronson ft. Bruno Mars,26310
-8642,Closer,The Chainsmokers ft. Halsey,22826
-4714,Levitating,Dua Lipa,22575
-9927,Drivers License,Olivia Rodrigo,29948
-7777,Bad Guy,Billie Eilish,25582
-1080,Happier Than Ever,Billie Eilish,25866
-9901,Dance Monkey,Tones and I,17861
-9433,Old Town Road,Lil Nas X,19109
-5083,Watermelon Sugar,Harry Styles,29419
-7030,Sunflower,Post Malone & Swae Lee,24604
-7554,Peaches,Justin Bieber,21548
-6818,Save Your Tears,The Weeknd,17298
-6718,Stay,The Kid LAROI & Justin Bieber,24961
-4843,As It Was,Harry Styles,16963
-2577,Anti-Hero,Taylor Swift,17042
-9045,Good 4 U,Olivia Rodrigo,16917
-4836,Montero (Call Me By Your Name),Lil Nas X,22671
-9610,Shivers,Ed Sheeran,21722
+track_id,title,artist,duration,energy_level,tempo,mood,is_instrumental,activity_fit
+7399,Blinding Lights,The Weeknd,15523,8,171,energetic,false,gym party running
+4733,Shape of You,Ed Sheeran,16697,7,96,happy,false,party cafe home
+4256,Uptown Funk,Mark Ronson ft. Bruno Mars,26310,9,115,energetic,false,party gym running
+8642,Closer,The Chainsmokers ft. Halsey,22826,6,95,happy,false,party cafe
+4714,Levitating,Dua Lipa,22575,8,103,energetic,false,party gym running
+9927,Drivers License,Olivia Rodrigo,29948,3,144,sad,false,home study
+7777,Bad Guy,Billie Eilish,25582,7,135,energetic,false,party gym
+1080,Happier Than Ever,Billie Eilish,25866,4,120,sad,false,home study cafe
+9901,Dance Monkey,Tones and I,17861,8,98,happy,false,party gym
+9433,Old Town Road,Lil Nas X,19109,7,136,happy,false,party running
+5083,Watermelon Sugar,Harry Styles,29419,7,95,happy,false,party cafe home
+7030,Sunflower,Post Malone & Swae Lee,24604,6,90,happy,false,cafe home
+7554,Peaches,Justin Bieber,21548,6,90,happy,false,party cafe
+6818,Save Your Tears,The Weeknd,17298,7,118,happy,false,party running
+6718,Stay,The Kid LAROI & Justin Bieber,24961,8,170,energetic,false,party gym running
+4843,As It Was,Harry Styles,16963,6,174,happy,false,party running
+2577,Anti-Hero,Taylor Swift,17042,5,97,happy,false,cafe home
+9045,Good 4 U,Olivia Rodrigo,16917,9,164,energetic,false,party gym running
+4836,Montero (Call Me By Your Name),Lil Nas X,22671,8,179,energetic,false,party gym
+9610,Shivers,Ed Sheeran,21722,7,141,happy,false,party running
+1001,Clair de Lune,Claude Debussy,18000,2,60,calm,true,study home cafe
+1002,Gymnopédie No.1,Erik Satie,21000,1,70,calm,true,study home cafe
+1003,Lo-Fi Study Beats,ChilledCow,24000,3,85,calm,true,study cafe
+1004,Ambient Meditation,Deep Focus,30000,1,65,calm,true,study home
+1005,Piano Instrumental,Peaceful Piano,22000,2,75,calm,true,study cafe home
