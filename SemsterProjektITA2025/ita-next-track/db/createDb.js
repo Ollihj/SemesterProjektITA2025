@@ -2,7 +2,7 @@ import { upload } from 'pg-upload';
 import { connect } from './connect.js';
 
 console.log('Recreating database...');
-
+//Git test
 const db = await connect();
 
 console.log('Dropping tables...');
