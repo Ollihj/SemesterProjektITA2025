@@ -147,6 +147,13 @@ body {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
 }
 
+.player-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .back-link {
   background: none;
   border: none;
@@ -156,14 +163,18 @@ body {
   margin-bottom: 12px;
   display: inline-flex;
   align-items: center;
+  margin: 0;
 }
 
 .player-activity-label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 .player-track-info {
