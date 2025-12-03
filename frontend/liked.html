@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NextTrack – Liked Songs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="liked.js" defer></script>
+</head>
+
+<body>
+  <main class="landing-container">
+    <div class="logo">♫</div>
+
+    <h1 class="brand-title">NextTrack</h1>
+    <p class="tagline">Your liked songs, in one place.</p>
+
+    <button id="backToHomeFromLiked" class="cta-btn back-btn pressable" style="margin-bottom: 26px;">
+      <span class="back-arrow">←</span>
+      <span class="back-text">Back to vibes</span>
+    </button>
+
+    <section class="player-card liked-card">
+      <header class="liked-card-header">
+        <p class="liked-card-title">Liked Songs</p>
+        <button id="clearLikedBtn" class="liked-clear-btn pressable">Clear all</button>
+      </header>
+
+      <div id="likedSongsContainer" class="liked-songs-container"></div>
+    </section>
+  </main>
+</body>
+</html>

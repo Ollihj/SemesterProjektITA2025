@@ -16,7 +16,6 @@
         <button class="back-link pressable" id="backToHomeBtn">← Back</button>
         <p class="player-activity-label" id="activityLabel">Gym</p>
       </div>
-  
 
       <div class="player-track-info">
         <div class="player-art-placeholder">♫</div>
@@ -27,7 +26,7 @@
         </div>
       </div>
 
-      <!-- NEW: progress bar + timers -->
+      <!-- progress bar + timers -->
       <div class="player-progress">
         <span class="time-label" id="currentTime">0:00</span>
         <div class="progress-bar">
@@ -36,10 +35,31 @@
         <span class="time-label" id="totalTime">0:00</span>
       </div>
 
+      <!-- CONTROLS -->
       <div class="player-controls">
-        <button class="icon-btn pressable" id="prevBtn">⏮</button>
-        <button class="icon-btn primary pressable" id="playPauseBtn">▶</button>
-        <button class="icon-btn pressable" id="nextBtn">⏭</button>
+        <!-- Dislike -->
+        <button
+          class="icon-btn pressable"
+          id="dislikeBtn"
+          aria-label="Dislike this type of song"
+          title="Dislike – avoid this song for a while"
+        >
+          −
+        </button>
+
+        <button class="icon-btn pressable" id="prevBtn" aria-label="Previous track">⏮</button>
+        <button class="icon-btn primary pressable" id="playPauseBtn" aria-label="Play/Pause">▶</button>
+        <button class="icon-btn pressable" id="nextBtn" aria-label="Next track">⏭</button>
+
+        <!-- Like -->
+        <button
+          class="icon-btn pressable"
+          id="likeBtn"
+          aria-label="Like and add to Liked Songs"
+          title="Like – add to Liked Songs and recommend similar"
+        >
+          +
+        </button>
       </div>
 
       <p class="player-hint">

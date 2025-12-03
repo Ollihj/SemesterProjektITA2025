@@ -219,10 +219,9 @@ body {
   color: var(--text-muted);
 }
 
-/* NEW: progress bar + timers */
+/* progress bar + timers */
 .player-progress {
   display: grid;
-  /* fixed width for time labels so the bar never moves */
   grid-template-columns: 50px 1fr 50px;
   align-items: center;
   gap: 10px;
@@ -233,7 +232,7 @@ body {
   font-size: 11px;
   color: var(--text-muted);
   text-align: center;
-  font-variant-numeric: tabular-nums; /* makes digits equal width in many browsers */
+  font-variant-numeric: tabular-nums;
 }
 
 .progress-bar {
@@ -252,7 +251,6 @@ body {
   width: 0%;
   border-radius: inherit;
   background: linear-gradient(90deg, #6f8bff, #ff6a88);
-  /* No transition – JS will move this smoothly using requestAnimationFrame */
 }
 
 /* Controls */
@@ -269,13 +267,27 @@ body {
   height: 44px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  background: #11152a;
-  color: #fff;
+  background-color: #11152a;
+  color: #ffffff;
   cursor: pointer;
   font-size: 18px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  line-height: 1;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.15s ease,
+    border-color 0.25s ease;
+}
+
+/* tiny vertical nudge for prev/next icons */
+#prevBtn,
+#nextBtn {
+  transform: translateY(1px);
 }
 
 .icon-btn.primary {
@@ -315,4 +327,175 @@ body {
   body {
     padding: 24px 14px;
   }
+}
+
+/* ------------------------------------
+   LIKED SONGS PAGE
+------------------------------------ */
+
+.liked-card {
+  max-width: 640px;
+  margin: 0 auto;
+  margin-top: 10px;
+
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+}
+
+.liked-card-header {
+  position: relative;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.liked-card-title {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+
+.liked-clear-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+/* scrollable list area inside the card */
+.liked-songs-container {
+  margin-top: 4px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* list + rows */
+.liked-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.liked-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* LEFT column: title + artist */
+.liked-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.liked-title-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.liked-artist-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* MIDDLE column: mood + BPM */
+.liked-meta {
+  text-align: right;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.liked-mood,
+.liked-bpm {
+  display: block;
+}
+
+.liked-mood {
+  margin-bottom: 2px;
+}
+
+/* RIGHT column: remove button */
+.liked-remove-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* empty state text */
+.liked-empty-message {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 10px 0 6px;
+}
+
+/* Mobile tweaks */
+@media (max-width: 550px) {
+  .liked-row {
+    grid-template-columns: minmax(0, 1.5fr) auto;
+    grid-template-rows: auto auto;
+  }
+
+  .liked-meta {
+    grid-column: 1 / -1;
+    text-align: left;
+    padding-left: 18px;
+    margin-top: 2px;
+  }
+}
+
+/* ------------------------------------
+   Back Button Improvements
+------------------------------------ */
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 34px;
+}
+
+/* Bigger + bolder arrow */
+.back-arrow {
+  font-size: 18px;
+  font-weight: 700;
+  display: inline-block;
+  transform: translateY(-1px);
+}
+
+/* Text remains clean */
+.back-text {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ------------------------------------
+   LIKE / DISLIKE FEEDBACK – neutral fill
+------------------------------------ */
+
+/* Shared flash style for both + and − */
+.icon-btn.flash-fill {
+  background-color: #ffffff;
+  color: #050716;
+  border-color: transparent;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.55);
+  transform: scale(1.06);
 }

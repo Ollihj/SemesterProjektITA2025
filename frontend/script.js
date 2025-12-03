@@ -1,5 +1,3 @@
-// script.js
-
 // Track list based on your short-tracks.csv
 const tracks = [
   { id: 7399,  title: "Blinding Lights",           artist: "The Weeknd",                        duration: 15523, energy_level: 8, tempo: 171, mood: "energetic",   is_instrumental: false, activity_fit: ["gym","party","running"] },
@@ -36,11 +34,34 @@ function getActivityFromUrl() {
   return activity ? activity.toLowerCase() : "gym";
 }
 
-// Format ms -> M:SS
+// Format seconds -> M:SS
 function formatTimeFromSeconds(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
+/* ---------- SIMPLE SIMILARITY HELPERS (for like-based recs) ---------- */
+
+function similarityScore(a, b) {
+  let score = 0;
+
+  if (a.mood === b.mood) score += 3;
+  if (a.is_instrumental === b.is_instrumental) score += 2;
+  if (a.artist === b.artist) score += 3;
+
+  const tempoDiff = Math.abs(a.tempo - b.tempo);
+  if (tempoDiff <= 5) score += 3;
+  else if (tempoDiff <= 15) score += 1;
+
+  const energyDiff = Math.abs(a.energy_level - b.energy_level);
+  if (energyDiff <= 1) score += 2;
+  else if (energyDiff <= 3) score += 1;
+
+  const sharedActivities = a.activity_fit.filter(x => b.activity_fit.includes(x)).length;
+  score += sharedActivities;
+
+  return score;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -64,6 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("nextBtn");
   const playPauseBtn = document.getElementById("playPauseBtn");
 
+  const dislikeBtn = document.getElementById("dislikeBtn");
+  const likeBtn = document.getElementById("likeBtn");
+
   // Filter tracks by activity
   let playlist = tracks.filter(t => t.activity_fit.includes(activity));
   if (playlist.length === 0) playlist = tracks;
@@ -78,6 +102,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // animation state
   let lastTimestamp = null;
   let rafId = null;
+
+  // disliked songs: Map(trackId -> remaining songs to skip)
+  const dislikedCounters = new Map();
+
+  // liked songs (used as taste seeds + stored in localStorage)
+  let likedSongs = [];
+  try {
+    const stored = localStorage.getItem("nexttrack-liked-songs");
+    if (stored) likedSongs = JSON.parse(stored);
+  } catch (e) {
+    likedSongs = [];
+  }
+
+  function saveLikedSongs() {
+    try {
+      localStorage.setItem("nexttrack-liked-songs", JSON.stringify(likedSongs));
+    } catch (e) { /* ignore */ }
+  }
+
+  // recent history of indices so we don't bounce between 2 songs
+  const recentHistory = [];
 
   const niceActivity = activity.charAt(0).toUpperCase() + activity.slice(1);
   activityLabel.textContent = niceActivity;
@@ -106,25 +151,33 @@ document.addEventListener("DOMContentLoaded", () => {
     playPauseBtn.textContent = isPlaying ? "⏸" : "▶";
   }
 
+  // Shared visual feedback for like/dislike buttons
+  function flashButton(btn) {
+    btn.classList.remove("flash-fill");
+    void btn.offsetWidth; // reflow so re-adding retriggers transition
+
+    btn.classList.add("flash-fill");
+    setTimeout(() => {
+      btn.classList.remove("flash-fill");
+    }, 300); // matches CSS transition nicely
+  }
+
   function animationLoop(timestamp) {
-    if (!isPlaying) return; // stop drawing if paused
+    if (!isPlaying) return;
 
     if (lastTimestamp === null) {
       lastTimestamp = timestamp;
     }
 
-    const delta = timestamp - lastTimestamp; // ms since last frame
+    const delta = timestamp - lastTimestamp;
     lastTimestamp = timestamp;
 
     currentMs += delta;
 
     if (currentMs >= durationMs) {
-      // clamp and auto-skip to next track
       currentMs = durationMs;
       updateProgressUI();
-      // load next track
-      currentIndex = (currentIndex + 1) % playlist.length;
-      loadTrack(); // loadTrack will restart animation if playing
+      goToNextTrack();  // auto-next at end
       return;
     }
 
@@ -139,8 +192,85 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Is a given track currently blocked by dislike?
+  function isBlockedTrack(track) {
+    const remaining = dislikedCounters.get(track.id);
+    return typeof remaining === "number" && remaining > 0;
+  }
+
+  // Choose next index, respecting dislike + recent history + likes
+  function chooseNextIndex() {
+    const n = playlist.length;
+    if (n <= 1) return currentIndex;
+
+    // candidate indices (not current)
+    const candidates = [];
+    for (let i = 0; i < n; i++) {
+      if (i !== currentIndex) candidates.push(i);
+    }
+
+    // 1) filter out blocked tracks
+    let allowed = candidates.filter(i => !isBlockedTrack(playlist[i]));
+    if (allowed.length === 0) allowed = candidates; // all blocked? fallback
+
+    // 2) avoid very recent tracks if possible
+    let pool = allowed.filter(i => !recentHistory.includes(i));
+    if (pool.length === 0) pool = allowed;
+
+    // 3) if no likes yet: basically "next in order" within pool
+    if (likedSongs.length === 0) {
+      for (let step = 1; step < n; step++) {
+        const idx = (currentIndex + step) % n;
+        if (pool.includes(idx)) return idx;
+      }
+      return pool[0];
+    }
+
+    // 4) with likes: pick allowed track most similar to liked seeds
+    function similarityToLiked(track) {
+      let best = 0;
+      for (const liked of likedSongs) {
+        best = Math.max(best, similarityScore(track, liked));
+      }
+      return best;
+    }
+
+    let bestIndex = pool[0];
+    let bestScore = -Infinity;
+
+    for (const idx of pool) {
+      const tr = playlist[idx];
+      const s = similarityToLiked(tr);
+      if (s > bestScore) {
+        bestScore = s;
+        bestIndex = idx;
+      } else if (s === bestScore) {
+        // tiebreaker: more "forward" in the playlist
+        const nStepsCurrent = (idx - currentIndex + n) % n;
+        const nStepsBest = (bestIndex - currentIndex + n) % n;
+        if (nStepsCurrent < nStepsBest) bestIndex = idx;
+      }
+    }
+
+    return bestIndex;
+  }
+
   function loadTrack() {
+    // decrement dislike counters each time we start ANY new song
+    for (const [id, remaining] of dislikedCounters.entries()) {
+      if (remaining > 1) dislikedCounters.set(id, remaining - 1);
+      else dislikedCounters.delete(id);
+    }
+
     const track = playlist[currentIndex];
+
+    // update recent history
+    recentHistory.push(currentIndex);
+    const maxHistory = Math.min(5, playlist.length - 1);
+    if (recentHistory.length > maxHistory) {
+      recentHistory.shift();
+    }
+
     trackTitle.textContent = track.title;
     trackArtist.textContent = track.artist;
 
@@ -154,6 +284,14 @@ document.addEventListener("DOMContentLoaded", () => {
     lastTimestamp = null;
 
     startAnimationIfNeeded();
+  }
+
+  function goToNextTrack() {
+    cancelAnimation();
+    currentIndex = chooseNextIndex();
+    isPlaying = true;
+    updatePlayPauseButton();
+    loadTrack();
   }
 
   // Initial state
@@ -175,11 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   nextBtn.addEventListener("click", () => {
-    cancelAnimation();
-    currentIndex = (currentIndex + 1) % playlist.length;
-    isPlaying = true;
-    updatePlayPauseButton();
-    loadTrack();
+    goToNextTrack();
   });
 
   playPauseBtn.addEventListener("click", () => {
@@ -187,11 +321,29 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePlayPauseButton();
 
     if (isPlaying) {
-      // resume animation from currentMs
       lastTimestamp = null;
       startAnimationIfNeeded();
     } else {
       cancelAnimation();
     }
+  });
+
+  // Dislike – don't play this song for the next 15 tracks
+  dislikeBtn.addEventListener("click", () => {
+    const track = playlist[currentIndex];
+    dislikedCounters.set(track.id, 15);
+    flashButton(dislikeBtn);
+    goToNextTrack();
+  });
+
+  // Like – add to Liked Songs + bias future picks
+  likeBtn.addEventListener("click", () => {
+    const track = playlist[currentIndex];
+    if (!likedSongs.some(t => t.id === track.id)) {
+      likedSongs.push({ ...track });
+      saveLikedSongs();
+    }
+    flashButton(likeBtn);
+    // we keep playing the same song; next picks are influenced by likedSongs
   });
 });
